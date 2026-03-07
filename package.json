@@ -1,7 +1,7 @@
 {
   "name": "qcm-test-logiciel",
   "version": "1.0.0",
-  "description": "QCM Fondamentaux des Tests Logiciels - ISTQB",
+  "type": "module",
   "engines": {
     "node": "24.x"
   }

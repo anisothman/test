@@ -61,3 +61,6 @@ qcm-vercel/
 - La clé API est stockée dans les variables d'environnement Vercel
 - Elle n'est JAMAIS visible dans le code HTML ou GitHub
 - Chaque utilisateur du site génère ses propres questions via votre clé
+
+
+

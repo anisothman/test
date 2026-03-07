@@ -3,35 +3,31 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
+  if (req.method === "OPTIONS") return res.status(204).end();
+  if (req.method !== "POST") return res.status(405).end();
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+  let body = "";
+  await new Promise((resolve) => {
+    req.on("data", chunk => body += chunk);
+    req.on("end", resolve);
+  });
 
-  try {
-    const body = {
+  const parsed = JSON.parse(body);
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 4096,
-      messages: req.body.messages
-    };
+      messages: parsed.messages
+    }),
+  });
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify(body),
-    });
-
-    const data = await response.json();
-    return res.status(response.status).json(data);
-
-  } catch (err) {
-    return res.status(500).json({ error: { message: err.message } });
-  }
+  const data = await response.json();
+  return res.status(response.status).json(data);
 }

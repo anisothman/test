@@ -6,14 +6,6 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).end();
 
-  let body = "";
-  await new Promise((resolve) => {
-    req.on("data", chunk => body += chunk);
-    req.on("end", resolve);
-  });
-
-  const parsed = JSON.parse(body);
-
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -24,7 +16,7 @@ export default async function handler(req, res) {
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 4096,
-      messages: parsed.messages
+      messages: req.body.messages
     }),
   });
 

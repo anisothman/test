@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCM — Fondamentaux des Tests Logiciels</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--accent:#4f8ef7;--accent2:#7c3aed;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--text:#f1f5f9;--muted:#94a3b8;--border:rgba(255,255,255,0.08);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 20%,rgba(79,142,247,0.08) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(124,58,237,0.07) 0%,transparent 60%);pointer-events:none;z-index:0;}
+.container{max-width:860px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-index:1;}
+.header{text-align:center;padding:3rem 0 2rem;}
+.badge{display:inline-flex;align-items:center;background:rgba(79,142,247,0.12);border:1px solid rgba(79,142,247,0.25);color:var(--accent);padding:0.35rem 1rem;border-radius:100px;font-size:0.78rem;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:1.2rem;}
+.header h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:800;background:linear-gradient(135deg,#f1f5f9 30%,#4f8ef7 70%,#7c3aed 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.8rem;}
+.header p{color:var(--muted);font-size:1rem;max-width:480px;margin:0 auto;line-height:1.6;}
+
+/* API KEY SCREEN */
+#screen-apikey{padding:2rem 0 3rem;}
+.apikey-card{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;padding:2rem;max-width:520px;margin:0 auto;}
+.apikey-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:0.5rem;color:var(--text);}
+.apikey-desc{font-size:0.88rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6;}
+.apikey-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:0.85rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;margin-bottom:1rem;outline:none;transition:border-color 0.2s;}
+.apikey-input:focus{border-color:var(--accent);}
+.apikey-input::placeholder{color:var(--muted);}
+.apikey-hint{font-size:0.78rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.5;}
+.apikey-hint a{color:var(--accent);text-decoration:none;}
+.apikey-hint a:hover{text-decoration:underline;}
+.save-btn{width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;transition:all 0.2s;}
+.save-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,142,247,0.35);}
+
+/* LEVEL SCREEN */
+#screen-level{display:none;padding:2rem 0 3rem;}
+.screen-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;text-align:center;margin-bottom:2rem;color:var(--muted);}
+.levels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.2rem;margin-bottom:2.5rem;}
+.level-card{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;padding:2rem 1.5rem;cursor:pointer;transition:all 0.25s;text-align:center;position:relative;overflow:hidden;}
+.level-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.25s;border-radius:inherit;}
+.level-card.easy::before{background:radial-gradient(ellipse at 50% 0%,rgba(16,185,129,0.15),transparent 70%);}
+.level-card.medium::before{background:radial-gradient(ellipse at 50% 0%,rgba(245,158,11,0.15),transparent 70%);}
+.level-card.hard::before{background:radial-gradient(ellipse at 50% 0%,rgba(239,68,68,0.15),transparent 70%);}
+.level-card:hover{transform:translateY(-4px);}
+.level-card:hover::before{opacity:1;}
+.level-card.easy:hover{border-color:rgba(16,185,129,0.5);box-shadow:0 8px 30px rgba(16,185,129,0.15);}
+.level-card.medium:hover{border-color:rgba(245,158,11,0.5);box-shadow:0 8px 30px rgba(245,158,11,0.15);}
+.level-card.hard:hover{border-color:rgba(239,68,68,0.5);box-shadow:0 8px 30px rgba(239,68,68,0.15);}
+.level-card.selected.easy{border-color:var(--success);background:rgba(16,185,129,0.08);}
+.level-card.selected.medium{border-color:var(--warning);background:rgba(245,158,11,0.08);}
+.level-card.selected.hard{border-color:var(--danger);background:rgba(239,68,68,0.08);}
+.level-icon{font-size:2.5rem;margin-bottom:0.8rem;display:block;}
+.level-name{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:0.4rem;}
+.level-card.easy .level-name{color:var(--success);}
+.level-card.medium .level-name{color:var(--warning);}
+.level-card.hard .level-name{color:var(--danger);}
+.level-desc{font-size:0.82rem;color:var(--muted);line-height:1.5;}
+.start-btn{display:block;width:100%;max-width:300px;margin:0 auto;padding:1rem;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;border:none;border-radius:14px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(79,142,247,0.3);}
+.start-btn:hover{transform:translateY(-2px);}
+.start-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+.change-key-btn{display:block;text-align:center;margin-top:1rem;font-size:0.8rem;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;}
+.change-key-btn:hover{color:var(--text);}
+
+/* LOADING */
+#screen-loading{display:none;text-align:center;padding:6rem 2rem;}
+.loader-ring{width:64px;height:64px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:600;color:var(--muted);margin-bottom:0.5rem;}
+.loading-sub{font-size:0.85rem;color:rgba(148,163,184,0.5);}
+
+/* QUIZ */
+#screen-quiz{display:none;}
+.quiz-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding:0.8rem 1.2rem;background:var(--surface);border:1px solid var(--border);border-radius:14px;flex-wrap:wrap;gap:0.8rem;}
+.meta-item{display:flex;align-items:center;gap:0.5rem;font-size:0.88rem;color:var(--muted);}
+.meta-item strong{color:var(--text);font-weight:600;}
+.progress-bar-wrap{background:var(--surface2);border-radius:100px;height:6px;overflow:hidden;margin-bottom:2rem;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width 0.5s;}
+.question-card{background:var(--surface);border:1.5px solid var(--border);border-radius:22px;padding:2.2rem 2rem;margin-bottom:1.5rem;animation:slideUp 0.35s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.question-num{font-size:0.78rem;font-weight:600;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.8rem;}
+.question-text{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:600;line-height:1.6;color:var(--text);margin-bottom:1.8rem;}
+.options-list{list-style:none;display:flex;flex-direction:column;gap:0.75rem;}
+.option-btn{width:100%;text-align:left;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:0.9rem;line-height:1.45;}
+.option-btn:hover:not(:disabled){border-color:rgba(79,142,247,0.5);background:rgba(79,142,247,0.07);transform:translateX(4px);}
+.option-letter{min-width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:0.78rem;font-weight:700;color:var(--muted);transition:all 0.18s;flex-shrink:0;}
+.option-btn.correct{background:rgba(16,185,129,0.1);border-color:var(--success);}
+.option-btn.correct .option-letter{background:var(--success);border-color:var(--success);color:white;}
+.option-btn.wrong{background:rgba(239,68,68,0.1);border-color:var(--danger);color:var(--muted);}
+.option-btn.wrong .option-letter{background:var(--danger);border-color:var(--danger);color:white;}
+.option-btn:disabled{cursor:default;}
+.explanation-box{display:none;margin-top:1.2rem;padding:1rem 1.2rem;background:rgba(79,142,247,0.07);border:1px solid rgba(79,142,247,0.2);border-radius:12px;font-size:0.88rem;color:#93c5fd;line-height:1.6;}
+.explanation-box.show{display:block;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.next-btn{display:none;width:100%;padding:0.95rem;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;border:none;border-radius:14px;cursor:pointer;transition:all 0.2s;margin-top:0.5rem;}
+.next-btn.show{display:block;animation:fadeIn 0.3s ease;}
+.next-btn:hover{transform:translateY(-2px);}
+
+/* RESULT */
+#screen-result{display:none;padding:2rem 0 4rem;}
+.result-hero{text-align:center;padding:3rem 1rem 2rem;}
+.result-emoji{font-size:4rem;margin-bottom:1rem;display:block;animation:bounce 0.6s ease;}
+@keyframes bounce{0%,100%{transform:scale(1);}50%{transform:scale(1.2);}}
+.result-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:0.5rem;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.result-subtitle{color:var(--muted);}
+.score-ring-wrap{display:flex;justify-content:center;margin:2rem 0;}
+.score-ring{position:relative;width:150px;height:150px;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-ring-bg{fill:none;stroke:var(--surface2);stroke-width:10;}
+.score-ring-fill{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:408;stroke-dashoffset:408;transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1);}
+.score-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.score-number{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;line-height:1;}
+.score-label{font-size:0.72rem;color:var(--muted);margin-top:0.2rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.3rem 1rem;text-align:center;}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:0.2rem;}
+.stat-val.green{color:var(--success);}.stat-val.red{color:var(--danger);}.stat-val.blue{color:var(--accent);}
+.stat-lbl{font-size:0.78rem;color:var(--muted);}
+.review-section{margin-bottom:2rem;}
+.review-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--muted);margin-bottom:1rem;letter-spacing:0.05em;text-transform:uppercase;}
+.review-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.3rem;margin-bottom:0.8rem;}
+.review-item.correct-item{border-color:rgba(16,185,129,0.25);}
+.review-item.wrong-item{border-color:rgba(239,68,68,0.25);}
+.review-q{font-size:0.9rem;font-weight:500;margin-bottom:0.6rem;line-height:1.5;}
+.review-answers{font-size:0.82rem;color:var(--muted);display:flex;flex-direction:column;gap:0.3rem;}
+.review-correct{color:var(--success);}.review-wrong{color:var(--danger);}
+.actions-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.btn-restart,.btn-change{padding:1rem;border-radius:14px;font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.2s;border:none;}
+.btn-restart{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;}
+.btn-restart:hover{transform:translateY(-2px);}
+.btn-change{background:var(--surface);color:var(--text);border:1.5px solid var(--border);}
+.btn-change:hover{background:var(--surface2);}
+.error-box{display:none;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:1rem 1.2rem;margin-top:1rem;font-size:0.88rem;color:#fca5a5;line-height:1.6;}
+.error-box.show{display:block;}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="badge">🎓 ISTQB Foundation Level</div>
+    <h1>Fondamentaux<br>des Tests Logiciels</h1>
+    <p>QCM généré par IA — 20 questions uniques à chaque session</p>
+  </div>
+
+  <!-- SCREEN 0 : API KEY -->
+  <div id="screen-apikey">
+    <div class="apikey-card">
+      <div class="apikey-title">🔑 Entrez votre clé API Anthropic</div>
+      <div class="apikey-desc">La clé est sauvegardée uniquement dans votre navigateur. Elle n'est jamais envoyée ailleurs que directement à Anthropic.</div>
+      <input type="password" class="apikey-input" id="apikey-input" placeholder="sk-ant-api03-..." />
+      <div class="apikey-hint">
+        Obtenez une clé gratuite sur <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+        → API Keys → Create Key
+      </div>
+      <button class="save-btn" onclick="saveApiKey()">Sauvegarder et continuer →</button>
+      <div class="error-box" id="error-apikey"></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 1 : LEVEL -->
+  <div id="screen-level">
+    <p class="screen-title">Choisissez votre niveau</p>
+    <div class="levels-grid">
+      <div class="level-card easy" onclick="selectLevel('facile',this)">
+        <span class="level-icon">🌱</span>
+        <div class="level-name">Facile</div>
+        <div class="level-desc">Définitions, concepts fondamentaux, terminologie ISTQB</div>
+      </div>
+      <div class="level-card medium" onclick="selectLevel('intermédiaire',this)">
+        <span class="level-icon">⚡</span>
+        <div class="level-name">Intermédiaire</div>
+        <div class="level-desc">7 principes, processus de test, distinctions entre concepts</div>
+      </div>
+      <div class="level-card hard" onclick="selectLevel('difficile',this)">
+        <span class="level-icon">🔥</span>
+        <div class="level-name">Difficile</div>
+        <div class="level-desc">Analyse approfondie, cas complexes, psychologie et indépendance</div>
+      </div>
+    </div>
+    <button class="start-btn" id="start-btn" onclick="startQuiz()" disabled>Générer les 20 questions →</button>
+    <button class="change-key-btn" onclick="changeKey()">🔑 Changer de clé API</button>
+    <div class="error-box" id="error-level"></div>
+  </div>
+
+  <!-- SCREEN 2 : LOADING -->
+  <div id="screen-loading">
+    <div class="loader-ring"></div>
+    <div class="loading-text">Génération des questions en cours…</div>
+    <div class="loading-sub">L'IA prépare 20 questions uniques pour vous</div>
+  </div>
+
+  <!-- SCREEN 3 : QUIZ -->
+  <div id="screen-quiz">
+    <div class="quiz-meta">
+      <div class="meta-item">📚 <span>Niveau : <strong id="meta-level">—</strong></span></div>
+      <div class="meta-item">❓ <span>Question <strong id="meta-q">1</strong> / 20</span></div>
+      <div class="meta-item">✅ <span>Score : <strong id="meta-score">0</strong></span></div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:5%"></div>
+    </div>
+    <div class="question-card">
+      <div class="question-num" id="q-num">Question 1 sur 20</div>
+      <div class="question-text" id="q-text"></div>
+      <ul class="options-list" id="options-list"></ul>
+      <div class="explanation-box" id="explanation-box"></div>
+    </div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Question suivante →</button>
+  </div>
+
+  <!-- SCREEN 4 : RESULT -->
+  <div id="screen-result">
+    <div class="result-hero">
+      <span class="result-emoji" id="result-emoji">🏆</span>
+      <div class="result-title" id="result-title">Excellent !</div>
+      <div class="result-subtitle" id="result-subtitle"></div>
+    </div>
+    <div class="score-ring-wrap">
+      <div class="score-ring">
+        <svg viewBox="0 0 140 140" width="150" height="150">
+          <circle class="score-ring-bg" cx="70" cy="70" r="65"/>
+          <circle class="score-ring-fill" id="ring-fill" cx="70" cy="70" r="65"/>
+        </svg>
+        <div class="score-center">
+          <div class="score-number" id="score-pct">0%</div>
+          <div class="score-label">Score final</div>
+        </div>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val green" id="stat-correct">0</div><div class="stat-lbl">Bonnes réponses</div></div>
+      <div class="stat-card"><div class="stat-val red"   id="stat-wrong">0</div><div class="stat-lbl">Mauvaises réponses</div></div>
+      <div class="stat-card"><div class="stat-val blue"  id="stat-level">—</div><div class="stat-lbl">Niveau</div></div>
+    </div>
+    <div class="review-section">
+      <div class="review-title">📋 Révision des réponses</div>
+      <div id="review-list"></div>
+    </div>
+    <div class="actions-row">
+      <button class="btn-restart" onclick="restartSameLevel()">🔄 Rejouer</button>
+      <button class="btn-change"  onclick="changeLevel()">🎯 Changer niveau</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const COURSE = `CHAPITRE 1 : FONDAMENTAUX DES TESTS LOGICIELS (ISTQB)
+1. DÉFINITION: Test logiciel = évaluer la qualité. VÉRIFICATION (conformité aux exigences) + VALIDATION (besoins utilisateurs). Test dynamique (exécution) vs Test statique (revues, sans exécution).
+2. OBJECTIFS: Provoquer défaillances, trouver défauts, assurer couverture, réduire risques, vérifier exigences, construire confiance. Varient selon contexte (SDLC, risques, type produit).
+3. TERMINOLOGIE: ERREUR (faute humaine) → DÉFAUT/bug (dans le logiciel) → DÉFAILLANCE (comportement incorrect observable). CAUSE RACINE = première cause. EFFET = conséquence. Un défaut ne cause pas toujours une défaillance.
+4. TEST vs DÉBOGAGE: Test détecte défaillances. Débogage trouve+analyse+corrige les défauts.
+5. AQ vs TEST: AQ définit processus/normes. CQ applique processus. Test = forme de CQ. Qualité = fonctionnel + non fonctionnel.
+6. LES 7 PRINCIPES: P1: montre PRÉSENCE pas absence. P2: test exhaustif IMPOSSIBLE. P3: tester TÔT économise (courbe Boehm). P4: REGROUPEMENT 80%/20% (Pareto). P5: USURE des tests (paradoxe pesticides). P6: dépend du CONTEXTE. P7: ILLUSION absence défaut.
+7. RÔLES: Test Manager (planification, pilotage, contrôle, clôture). Testeur (analyse, conception, implémentation, exécution).
+8. COMPÉTENCES: Rigueur, attention, curiosité, communication, esprit critique, créativité, connaissances techniques, domaine métier.
+9. PSYCHOLOGIE: Biais confirmation (développeurs croient leur code correct). Test perçu destructif. Communication = neutralité + faits. Testeur = pessimisme professionnel + curiosité.
+10. ÉQUIPE INTÉGRÉE (XP): Tous responsables de la qualité. Collaboration représentants métier + développeurs. PAS appropriée pour systèmes critiques de sécurité.
+11. INDÉPENDANCE: Niveaux: auteur → pairs → équipe interne → testeurs externes. Avantages: regard différent, hypothèses remises en question. Inconvénients: isolement, communication, goulot d'étranglement.`;
+
+let apiKey = localStorage.getItem('anthropic_key') || '';
+let selectedLevel = null, questions = [], currentQ = 0, score = 0, userAnswers = [];
+
+const LOCAL_QUESTIONS = [
+  {
+    question: 'Quel est l objectif principal du test logiciel ?',
+    options: ['Prouver l absence totale de defauts', 'Evaluer la qualite du logiciel', 'Remplacer le debogage', 'Ecrire du code plus vite'],
+    correct: 1,
+    explanation: 'Le test sert a evaluer la qualite et reduire les risques, pas a prouver une absence totale de defauts.'
+  },
+  {
+    question: 'Quelle combinaison est correcte ?',
+    options: ['Validation = conformite exigences ; Verification = besoins utilisateurs', 'Verification = conformite exigences ; Validation = besoins utilisateurs', 'Verification = execution ; Validation = revue', 'Validation = correction ; Verification = prevention'],
+    correct: 1,
+    explanation: 'Verification : sommes-nous conformes aux exigences ? Validation : repond-on aux besoins utilisateurs ?'
+  },
+  {
+    question: 'Quel enchainement est juste ?',
+    options: ['Defaillance -> Erreur -> Defaut', 'Erreur -> Defaut -> Defaillance', 'Defaut -> Erreur -> Defaillance', 'Erreur -> Defaillance -> Defaut'],
+    correct: 1,
+    explanation: 'Une erreur humaine peut introduire un defaut, qui peut provoquer une defaillance observable.'
+  },
+  {
+    question: 'Le test statique consiste a :',
+    options: ['Executer le logiciel avec des donnees reelles', 'Mesurer la performance en charge', 'Analyser artefacts sans execution', 'Corriger automatiquement les bugs'],
+    correct: 2,
+    explanation: 'Le test statique (revues, analyses) ne necessite pas l execution du code.'
+  },
+  {
+    question: 'Test et debogage :',
+    options: ['Le test corrige les defauts', 'Le debogage detecte seulement les defaillances', 'Le test detecte ; le debogage analyse et corrige', 'Ce sont des synonymes'],
+    correct: 2,
+    explanation: 'Le test met en evidence des defaillances ; le debogage trouve la cause et corrige le defaut.'
+  },
+  {
+    question: 'Principe 1 ISTQB :',
+    options: ['Les tests montrent la presence de defauts, pas leur absence', 'Le test exhaustif est possible', 'Tester tard coute moins cher', 'Tous les contextes sont identiques'],
+    correct: 0,
+    explanation: 'On peut montrer la presence de defauts, jamais prouver mathematiquement leur absence totale.'
+  },
+  {
+    question: 'Principe 2 ISTQB :',
+    options: ['Tester tot est inutile', 'Le test exhaustif est impossible', 'Tous les defauts sont critiques', 'Les tests ne s usent pas'],
+    correct: 1,
+    explanation: 'Le nombre de combinaisons est trop grand ; il faut prioriser selon le risque.'
+  },
+  {
+    question: 'Principe 3 ISTQB recommande de :',
+    options: ['Tester le plus tard possible', 'Tester tot dans le cycle de vie', 'Tester uniquement en production', 'Eviter les revues'],
+    correct: 1,
+    explanation: 'Plus un defaut est trouve tot, moins sa correction coute cher.'
+  },
+  {
+    question: 'Le regroupement des defauts (Pareto) signifie :',
+    options: ['20% des modules causent souvent 80% des defauts', '80% des tests sont inutiles', '20% des utilisateurs trouvent 80% des bugs', 'Chaque module contient autant de defauts'],
+    correct: 0,
+    explanation: 'Les defauts sont souvent concentres dans certaines zones du logiciel.'
+  },
+  {
+    question: 'Paradoxe du pesticide :',
+    options: ['Toujours rejouer les memes tests suffit', 'Les tests perdent en efficacite s ils ne sont pas renouvelles', 'Les tests automatiques sont interdits', 'Le contexte ne compte pas'],
+    correct: 1,
+    explanation: 'Des jeux de tests figes detectent de moins en moins de nouveaux defauts avec le temps.'
+  },
+  {
+    question: 'Le principe "test depend du contexte" implique :',
+    options: ['Une strategie unique pour tous les projets', 'Adapter la strategie selon domaine, risque, objectifs', 'Tester seulement le fonctionnel', 'Ignorer les exigences'],
+    correct: 1,
+    explanation: 'Le niveau de criticite et le type de systeme dictent l approche de test.'
+  },
+  {
+    question: 'Illusion d absence de defauts :',
+    options: ['Si peu de bugs sont trouves, le produit est toujours utile', 'Un produit sans bugs peut rester inadapte aux besoins', 'Les defauts n ont aucun impact', 'Le test remplace la qualite'],
+    correct: 1,
+    explanation: 'Un logiciel peut etre "propre" techniquement mais ne pas satisfaire les attentes metier.'
+  },
+  {
+    question: 'AQ (Assurance Qualite) par rapport au test :',
+    options: ['AQ est une partie du debogage', 'AQ definit processus et normes ; test est une activite de CQ', 'AQ ne concerne pas le logiciel', 'AQ et test sont identiques'],
+    correct: 1,
+    explanation: 'AQ structure le cadre qualite ; le test contribue au controle qualite.'
+  },
+  {
+    question: 'Role principal du Test Manager :',
+    options: ['Coder les nouvelles fonctionnalites', 'Planifier et piloter les activites de test', 'Signer les contrats clients', 'Remplacer les utilisateurs'],
+    correct: 1,
+    explanation: 'Le Test Manager organise la strategie, le suivi et la cloture de test.'
+  },
+  {
+    question: 'Competence cle pour un testeur :',
+    options: ['Ignorer les details', 'Esprit critique et communication factuelle', 'Optimisme aveugle', 'Eviter les questions'],
+    correct: 1,
+    explanation: 'Le test exige rigueur, curiosite et communication neutre basee sur des faits.'
+  },
+  {
+    question: 'Le biais de confirmation chez les developpeurs peut :',
+    options: ['Aider a trouver plus de defauts', 'Faire croire que le code est correct sans preuve suffisante', 'Supprimer le besoin de test', 'Garantir la qualite'],
+    correct: 1,
+    explanation: 'Ce biais pousse a chercher des preuves qui confirment ses hypotheses initiales.'
+  },
+  {
+    question: 'Independance des tests : avantage principal ?',
+    options: ['Moins de communication necessaire', 'Regard neuf qui remet en cause les hypotheses', 'Suppression de tous les risques', 'Plus aucun conflit possible'],
+    correct: 1,
+    explanation: 'Un regard externe aide a identifier des angles morts de l equipe auteur.'
+  },
+  {
+    question: 'Independance des tests : inconvenient possible ?',
+    options: ['Aucun inconvenient', 'Goulot d etranglement et distance avec l equipe', 'Qualite toujours plus faible', 'Impossibilite de tester'],
+    correct: 1,
+    explanation: 'Une equipe trop separee peut ralentir les echanges et la resolution des problemes.'
+  },
+  {
+    question: 'Dans une equipe integree (type XP), la qualite est :',
+    options: ['Responsabilite du testeur seulement', 'Responsabilite collective', 'Uniquement celle du manager', 'Externe au projet'],
+    correct: 1,
+    explanation: 'Dans une equipe integree, metier, dev et test collaborent sur la qualite.'
+  },
+  {
+    question: 'Quel objectif de test est lie au risque ?',
+    options: ['Augmenter volontairement les defauts', 'Reduire le risque de defaillances en production', 'Eviter toute documentation', 'Supprimer les exigences'],
+    correct: 1,
+    explanation: 'Le test sert notamment a maitriser les risques produit et metier.'
+  }
+];
+
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function buildLocalQuiz(level) {
+  let pool = [...LOCAL_QUESTIONS];
+  if (level === 'facile') pool = LOCAL_QUESTIONS.slice(0, 12);
+  else if (level === 'intermédiaire') pool = LOCAL_QUESTIONS.slice(4, 18);
+  else if (level === 'difficile') pool = LOCAL_QUESTIONS.slice(6);
+  const source = shuffleArray(pool.length >= 20 ? pool : LOCAL_QUESTIONS);
+  const out = [];
+  for (let i = 0; i < 20; i++) out.push(source[i % source.length]);
+  return out;
+}
+
+// Init
+window.onload = () => {
+  if (apiKey) { show('screen-level'); hide('screen-apikey'); }
+  else { show('screen-apikey'); hide('screen-level'); }
+};
+
+function saveApiKey() {
+  const val = document.getElementById('apikey-input').value.trim();
+  if (!val.startsWith('sk-ant-')) {
+    const box = document.getElementById('error-apikey');
+    box.textContent = '❌ Clé invalide — elle doit commencer par sk-ant-';
+    box.classList.add('show'); return;
+  }
+  apiKey = val;
+  localStorage.setItem('anthropic_key', apiKey);
+  hide('screen-apikey'); show('screen-level');
+}
+
+function changeKey() {
+  localStorage.removeItem('anthropic_key');
+  apiKey = '';
+  hide('screen-level'); show('screen-apikey');
+  document.getElementById('apikey-input').value = '';
+}
+
+function selectLevel(level, el) {
+  document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedLevel = level;
+  document.getElementById('start-btn').disabled = false;
+  document.getElementById('error-level').classList.remove('show');
+}
+
+async function startQuiz() {
+  if (!selectedLevel) return;
+  show('screen-loading'); hide('screen-level');
+
+  const prompt = `Tu es un expert ISTQB. Génère EXACTEMENT 20 questions QCM en français basées sur ce cours:\n${COURSE}\n\nNiveau: ${selectedLevel}\nFACILE=définitions simples. INTERMÉDIAIRE=compréhension 7 principes. DIFFICILE=analyse situations complexes.\n\nRègles: 4 options par question, UNE seule bonne réponse, varie les sujets.\n\nRéponds UNIQUEMENT avec du JSON valide sans markdown:\n{"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"..."}]}\n\n"correct"=index 0-3. Génère exactement 20 questions.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-latest',
+        max_tokens: 4096,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    let data = null;
+    try { data = await res.json(); } catch (_) { /* keep null if body is not JSON */ }
+
+    if (res.status === 401) throw new Error('Clé API invalide — vérifiez votre clé sur console.anthropic.com');
+    if (!res.ok) {
+      const apiMsg = (data && data.error && data.error.message) ? data.error.message : 'Requête refusée par Anthropic';
+      throw new Error(`Erreur API ${res.status} : ${apiMsg}`);
+    }
+
+    if (!data || !Array.isArray(data.content)) throw new Error('Réponse API inattendue');
+    if (data.error) throw new Error(data.error.message);
+
+    let raw = data.content.map(i => i.text || '').join('');
+    raw = raw.replace(/```json|```/g, '').trim();
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Format JSON invalide');
+
+    const parsed = JSON.parse(match[0]);
+    if (!parsed.questions || parsed.questions.length < 5) throw new Error('Pas assez de questions');
+
+    questions = parsed.questions.slice(0, 20);
+    currentQ = 0; score = 0; userAnswers = [];
+    hide('screen-loading'); show('screen-quiz');
+    renderQuestion();
+
+  } catch (err) {
+    const msg = String(err && err.message ? err.message : err);
+    if (msg.toLowerCase().includes('credit balance is too low')) {
+      questions = buildLocalQuiz(selectedLevel);
+      currentQ = 0; score = 0; userAnswers = [];
+      hide('screen-loading'); show('screen-quiz');
+      renderQuestion();
+      return;
+    }
+
+    hide('screen-loading'); show('screen-level');
+    const box = document.getElementById('error-level');
+    box.textContent = `❌ ${msg}`;
+    box.classList.add('show');
+    if (msg.includes('invalide')) {
+      localStorage.removeItem('anthropic_key');
+      setTimeout(() => { hide('screen-level'); show('screen-apikey'); }, 2000);
+    }
+  }
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  const letters = ['A','B','C','D'];
+  document.getElementById('meta-level').textContent = selectedLevel;
+  document.getElementById('meta-q').textContent = currentQ + 1;
+  document.getElementById('meta-score').textContent = score;
+  document.getElementById('progress-fill').style.width = `${((currentQ+1)/questions.length)*100}%`;
+  document.getElementById('q-num').textContent = `Question ${currentQ+1} sur ${questions.length}`;
+  document.getElementById('q-text').textContent = q.question;
+  const list = document.getElementById('options-list');
+  list.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    li.appendChild(btn); list.appendChild(li);
+  });
+  document.getElementById('explanation-box').classList.remove('show');
+  const nb = document.getElementById('next-btn');
+  nb.classList.remove('show'); nb.style.display = 'none';
+}
+
+function selectAnswer(idx) {
+  const q = questions[currentQ];
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+  const ok = idx === q.correct;
+  if (ok) score++;
+  userAnswers.push({ question: q.question, chosen: idx, correct: q.correct, options: q.options });
+  btns.forEach((btn, i) => {
+    if (i === q.correct) btn.classList.add('correct');
+    else if (i === idx && !ok) btn.classList.add('wrong');
+  });
+  const exp = document.getElementById('explanation-box');
+  exp.textContent = `💡 ${q.explanation}`; exp.classList.add('show');
+  document.getElementById('meta-score').textContent = score;
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'block'; nb.classList.add('show');
+  nb.textContent = currentQ < questions.length - 1 ? 'Question suivante →' : 'Voir mes résultats 🏆';
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ < questions.length) renderQuestion(); else showResults();
+}
+
+function showResults() {
+  hide('screen-quiz'); show('screen-result');
+  const pct = Math.round((score / questions.length) * 100);
+  let emoji, title, subtitle;
+  if      (pct >= 90) { emoji='🏆'; title='Excellent !';    subtitle='Maîtrise parfaite du chapitre !'; }
+  else if (pct >= 75) { emoji='🌟'; title='Très bien !';    subtitle='Bonne maîtrise du cours !'; }
+  else if (pct >= 60) { emoji='👍'; title='Bien !';         subtitle='Quelques points à retravailler.'; }
+  else if (pct >= 40) { emoji='📚'; title='À retravailler'; subtitle='Relisez le cours et recommencez.'; }
+  else                { emoji='💪'; title='Courage !';      subtitle='Le cours mérite une relecture complète.'; }
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-subtitle').textContent = subtitle;
+  document.getElementById('score-pct').textContent = pct + '%';
+  document.getElementById('stat-correct').textContent = score;
+  document.getElementById('stat-wrong').textContent = questions.length - score;
+  document.getElementById('stat-level').textContent = selectedLevel;
+  const circ = 2 * Math.PI * 65;
+  const fill = document.getElementById('ring-fill');
+  fill.style.stroke = pct >= 75 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
+  setTimeout(() => { fill.style.strokeDashoffset = circ - (circ * pct / 100); }, 100);
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  userAnswers.forEach((ans, i) => {
+    const ok = ans.chosen === ans.correct;
+    const div = document.createElement('div');
+    div.className = `review-item ${ok ? 'correct-item' : 'wrong-item'}`;
+    div.innerHTML = `<div class="review-q">${ok?'✅':'❌'} Q${i+1}. ${ans.question}</div>
+      <div class="review-answers">
+        ${!ok?`<span class="review-wrong">Votre réponse : ${ans.options[ans.chosen]}</span>`:''}
+        <span class="review-correct">✓ Bonne réponse : ${ans.options[ans.correct]}</span>
+      </div>`;
+    reviewList.appendChild(div);
+  });
+}
+
+function restartSameLevel() { hide('screen-result'); show('screen-loading'); startQuiz(); }
+function changeLevel() {
+  hide('screen-result'); show('screen-level');
+  selectedLevel = null;
+  document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('start-btn').disabled = true;
+  questions = []; currentQ = 0; score = 0; userAnswers = [];
+}
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+</script>
+</body>
+</html>

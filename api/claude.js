@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Allow all origins
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -13,6 +12,12 @@ export default async function handler(req, res) {
   }
 
   try {
+    const body = {
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 4096,
+      messages: req.body.messages
+    };
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -20,7 +25,7 @@ export default async function handler(req, res) {
         "x-api-key": process.env.ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01",
       },
-      body: JSON.stringify(req.body),
+      body: JSON.stringify(body),
     });
 
     const data = await response.json();

@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "description": "QCM Fondamentaux des Tests Logiciels - ISTQB",
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   }
 }
